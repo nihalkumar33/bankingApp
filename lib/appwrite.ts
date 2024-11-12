@@ -1,5 +1,5 @@
+// src/lib/server/appwrite.js
 "use server";
-
 import { Client, Account, Databases, Users } from "node-appwrite";
 import { cookies } from "next/headers";
 
@@ -9,7 +9,6 @@ export async function createSessionClient() {
     .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!);
 
   const session = cookies().get("appwrite-session");
-
   if (!session || !session.value) {
     throw new Error("No session");
   }
@@ -24,6 +23,17 @@ export async function createSessionClient() {
 }
 
 export async function createAdminClient() {
+  if (!process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT) {
+    console.error("Appwrite endpoint is missing!");
+  }
+  if (!process.env.NEXT_PUBLIC_APPWRITE_PROJECT) {
+    console.error("Appwrite project ID is missing!");
+  }
+  if (!process.env.NEXT_APPWRITE_KEY) {
+    console.error("Appwrite API key is missing!");
+  }
+
+  
   const client = new Client()
     .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
     .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!)
@@ -33,10 +43,12 @@ export async function createAdminClient() {
     get account() {
       return new Account(client);
     },
-    get database() {
+
+    get databases() {
       return new Databases(client);
     },
-    get user() {
+
+    get users() {
       return new Users(client);
     }
   };
